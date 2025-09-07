@@ -4,7 +4,8 @@ local plugins = {
   require('plugins.nvim-tree'),
   require('plugins.telescope'),
   require('plugins.lsp'),
-  require('plugins.vim-tmux-navigator')
+  require('plugins.vim-tmux-navigator'),
+  require('plugins.blink')
 }
 
 local opts = {

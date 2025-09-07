@@ -5,135 +5,83 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "neovim/nvim-lspconfig"
     },
-    config = function()
+    opts = {
+      servers = {
+        lua_ls = {
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = {"vim"},
+              },
+            },
+          },
+        },
+        rust_analyzer = {
+          settings = {
+            ["rust-analyzer"] = {
+              cargo = {
+                allFeatures = true,
+              },
+              checkOnSave = {
+                command = "clippy",
+              },
+              procMacro = {
+                enable = true,
+              },
+            },
+          },
+        },
+      },
+    },
+    config = function(_, opts)
       require("mason").setup()
 
       require("mason-lspconfig").setup({
-        ensure_installed = {"lua_ls", "rust_analyzer"},
+        ensure_installed = { "lua_ls", "rust_analyzer" },
         automatic_installation = true,
       })
 
-      -- Configure diagnostics to show immediately
-      vim.diagnostic.config({
-        virtual_text = {
-          enabled = true,
-          source = "if_many",
-          prefix = "●",
-        },
-        signs = true,
-        underline = true,
-        update_in_insert = false,
-        severity_sort = true,
-      })
-
-      -- Override the default publish_diagnostics handler for immediate display
-      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-        vim.lsp.diagnostic.on_publish_diagnostics, {
-          -- Enable underline, use virtual text for errors only
-          underline = true,
-          virtual_text = {
-            spacing = 2,
-            prefix = "●",
-          },
-          signs = true,
-          update_in_insert = false,
-        }
-      )
-
-      -- Force diagnostics to show immediately when opening files
-      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = "*.rs",
-        callback = function(args)
-          local bufnr = args.buf
-          -- Wait for LSP to attach, then request diagnostics
-          vim.defer_fn(function()
-            local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
-            for _, client in ipairs(clients) do
-              if client.name == "rust_analyzer" then
-                -- Request diagnostics from rust-analyzer
-                vim.lsp.buf_request(bufnr, "textDocument/diagnostic", {
-                  textDocument = vim.lsp.util.make_text_document_params(bufnr)
-                })
-                break
-              end
-            end
-          end, 1500)
-        end,
-      })
-
-      -- Common on_attach function
-      local on_attach = function(client, bufnr)
-        -- Enable completion triggered by <c-x><c-o>
-        vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        
-        -- Force immediate diagnostic request when LSP attaches
-        if client.name == "rust_analyzer" then
-          vim.defer_fn(function()
-            vim.lsp.buf_request(bufnr, "textDocument/diagnostic", {
-              textDocument = vim.lsp.util.make_text_document_params(bufnr)
-            })
-          end, 500)
-        end
+      for server, config in pairs(opts.servers) do
+        vim.lsp.config(server, config)
+        vim.lsp.enable(server)
       end
 
-      -- LSP server configurations
-      local lspconfig = require("lspconfig")
-      
-      -- Configure rust-analyzer
-      lspconfig.rust_analyzer.setup({
-        on_attach = on_attach,
-        cmd = { "rust-analyzer" },
-        filetypes = { "rust" },
-        root_dir = lspconfig.util.root_pattern("Cargo.toml", "rust-project.json"),
-        settings = {
-          ["rust-analyzer"] = {
-            -- Enable immediate diagnostics
-            diagnostics = {
-              enable = true,
-              experimental = {
-                enable = true,
-              },
-            },
-            -- Enable cargo check without save requirement
-            cargo = {
-              buildScripts = {
-                enable = true,
-              },
-              features = "all",
-            },
-            -- Disable checkOnSave and enable real-time checking
-            checkOnSave = false,
-            -- Enable proc macros
-            procMacro = {
-              enable = true,
-            },
-          },
-        },
-        -- Reduce debounce for faster feedback
-        flags = {
-          debounce_text_changes = 50,
-        },
+
+      vim.diagnostic.config({
+        --virtual_text = true,
+        virtual_lines = true,
+        --underline = true 
       })
 
-      -- Configure Lua LSP
-      lspconfig.lua_ls.setup({
-        on_attach = on_attach,
-        settings = {
-          Lua = {
-            runtime = {
-              version = "LuaJIT",
-            },
-            diagnostics = {
-              globals = {"vim"},
-            },
-            workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
-            },
-            telemetry = {
-              enable = false,
-            },
-          },
-        },
+      -- Set up LSP keymaps using LspAttach autocommand (recommended approach)
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+        callback = function(ev)
+          -- Buffer local mappings
+          local opts = { buffer = ev.buf }
+
+          -- Navigation
+          vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = 'Go to declaration' })
+          vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = 'Go to definition' })
+          vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = ev.buf, desc = 'Go to implementation' })
+          vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition,
+            { buffer = ev.buf, desc = 'Go to type definition' })
+          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = 'Rename buffer' })
+          vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'Code actions' })
+          vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = ev.buf, desc = 'Go to references' })
+
+          -- Documentation
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = ev.buf, desc = 'Hover Documentation' })
+          vim.keymap.set("n", "<leader>f", function()
+            vim.lsp.buf.format({ async = true })
+          end, { buffer = ev.buf, desc = 'Format the source' })
+
+          vim.keymap.set("n", "<leader>d", function()
+            vim.diagnostic.open_float({
+              border = "rounded",
+            })
+          end, { buffer = ev.buf, desc = 'Open float diagnostic' })
+        end,
       })
     end
   }

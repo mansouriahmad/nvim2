@@ -62,7 +62,8 @@ return {
           if client then
             require("workspace-diagnostics").setup({
               workspace_files = function()
-                return vim.fn.systemlist("find . -name '*.rs' -o -name '*.lua' -o -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.tsx' | head -1000")
+                return vim.fn.systemlist(
+                "find . -name '*.rs' -o -name '*.lua' -o -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.tsx' | head -1000")
               end
             })
             -- Auto-populate workspace diagnostics when LSP attaches
@@ -93,11 +94,6 @@ return {
               border = "rounded",
             })
           end, { buffer = ev.buf, desc = 'Open float diagnostic' })
-
-          -- Workspace diagnostics keymap
-          vim.keymap.set("n", "<leader>wD", function()
-            vim.cmd("lopen")
-          end, { buffer = ev.buf, desc = 'Open workspace diagnostics location list' })
         end,
       })
     end

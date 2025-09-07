@@ -10,7 +10,8 @@ local plugins = {
   require('plugins.autopairs'),
   require('plugins.trouble'),
   require('plugins.misc'),
-  require('plugins.lualine')
+  require('plugins.lualine'),
+  require('plugins.which-key')
 }
 
 local opts = {

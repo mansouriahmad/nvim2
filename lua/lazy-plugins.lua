@@ -2,7 +2,9 @@ local plugins = {
   require('plugins.colorschemes'),
   require('plugins.treesitter'),
   require('plugins.nvim-tree'),
-  require('plugins.telescope')
+  require('plugins.telescope'),
+  require('plugins.lsp'),
+  require('plugins.vim-tmux-navigator')
 }
 
 local opts = {

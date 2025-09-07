@@ -5,7 +5,12 @@ local plugins = {
   require('plugins.telescope'),
   require('plugins.lsp'),
   require('plugins.vim-tmux-navigator'),
-  require('plugins.blink')
+  require('plugins.blink'),
+  require('plugins.conform'),
+  require('plugins.autopairs'),
+  require('plugins.trouble'),
+  require('plugins.misc'),
+  require('plugins.lualine')
 }
 
 local opts = {

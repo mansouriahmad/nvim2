@@ -3,7 +3,8 @@ return {
     "williamboman/mason.nvim",
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
-      "neovim/nvim-lspconfig"
+      "neovim/nvim-lspconfig",
+      "artemave/workspace-diagnostics.nvim",
     },
     opts = {
       servers = {
@@ -11,7 +12,7 @@ return {
           settings = {
             Lua = {
               diagnostics = {
-                globals = {"vim"},
+                globals = { "vim" },
               },
             },
           },
@@ -46,17 +47,28 @@ return {
         vim.lsp.enable(server)
       end
 
-
       vim.diagnostic.config({
         --virtual_text = true,
         virtual_lines = true,
-        --underline = true 
+        --underline = true
       })
 
       -- Set up LSP keymaps using LspAttach autocommand (recommended approach)
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
         callback = function(ev)
+          -- Setup workspace-diagnostics for this client
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+          if client then
+            require("workspace-diagnostics").setup({
+              workspace_files = function()
+                return vim.fn.systemlist("find . -name '*.rs' -o -name '*.lua' -o -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.tsx' | head -1000")
+              end
+            })
+            -- Auto-populate workspace diagnostics when LSP attaches
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, ev.buf)
+          end
+
           -- Buffer local mappings
           local opts = { buffer = ev.buf }
 
@@ -81,6 +93,11 @@ return {
               border = "rounded",
             })
           end, { buffer = ev.buf, desc = 'Open float diagnostic' })
+
+          -- Workspace diagnostics keymap
+          vim.keymap.set("n", "<leader>wD", function()
+            vim.cmd("lopen")
+          end, { buffer = ev.buf, desc = 'Open workspace diagnostics location list' })
         end,
       })
     end

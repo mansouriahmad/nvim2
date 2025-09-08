@@ -15,18 +15,21 @@ return {
           filesize_limit = 0.1, -- MB
           timeout = 250, -- ms
         },
-        layout_strategy = 'horizontal',
+        layout_strategy = 'flex',
         layout_config = {
           horizontal = {
             preview_width = 0.6,
-            results_width = 0.8,
           },
           vertical = {
             mirror = false,
+            preview_height = 0.4,
+          },
+          flex = {
+            flip_columns = 90, -- Switch to vertical when width < 90 columns
           },
           width = 0.87,
           height = 0.80,
-          preview_cutoff = 120,
+          preview_cutoff = 60, -- Show preview when window > 60 columns
         },
         mappings = {
           i = {
@@ -54,6 +57,106 @@ return {
         },
         find_files = {
           -- Uses default center popup style
+        },
+        lsp_references = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+              mirror = true,
+            },
+            flex = {
+              flip_columns = 100, -- Switch to vertical when width < 100 columns
+            },
+            width = 0.9,
+            height = 0.85,
+          },
+        },
+        lsp_definitions = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+              mirror = true,
+            },
+            flex = {
+              flip_columns = 100,
+            },
+            width = 0.9,
+            height = 0.85,
+          },
+        },
+        lsp_implementations = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+              mirror = true,
+            },
+            flex = {
+              flip_columns = 100,
+            },
+            width = 0.9,
+            height = 0.85,
+          },
+        },
+        lsp_type_definitions = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+              mirror = true,
+            },
+            flex = {
+              flip_columns = 100,
+            },
+            width = 0.9,
+            height = 0.85,
+          },
+        },
+        lsp_document_symbols = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+            },
+            flex = {
+              flip_columns = 100,
+            },
+            width = 0.9,
+            height = 0.85,
+          },
+        },
+        lsp_workspace_symbols = {
+          layout_strategy = 'flex',
+          layout_config = {
+            horizontal = {
+              preview_width = 0.5,
+            },
+            vertical = {
+              preview_height = 0.4,
+            },
+            flex = {
+              flip_columns = 100,
+            },
+            width = 0.9,
+            height = 0.85,
+          },
         },
       },
     })

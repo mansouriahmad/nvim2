@@ -11,7 +11,8 @@ local plugins = {
   require('plugins.trouble'),
   require('plugins.misc'),
   require('plugins.lualine'),
-  require('plugins.which-key')
+  require('plugins.which-key'),
+  require('plugins.mini-indentscope')
 }
 
 local opts = {

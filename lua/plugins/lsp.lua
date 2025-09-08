@@ -32,13 +32,40 @@ return {
             },
           },
         },
+        ruff = {
+          init_options = {
+            settings = {
+              -- Any extra CLI arguments for `ruff` go here.
+              args = {},
+            }
+          }
+        },
+        omnisharp = {
+          settings = {
+            FormattingOptions = {
+              -- Enables support for reading code style, naming convention and analyzer
+              -- settings from .editorconfig.
+              EnableEditorConfigSupport = true,
+              -- Specifies whether 'using' directives should be grouped and sorted during
+              -- document formatting.
+              OrganizeImports = true,
+            },
+            MsBuild = {
+              -- If true, MSBuild project system will only load projects for files that
+              -- were opened in the editor. This setting is useful for big C# codebases
+              -- and allows for faster initialization of code navigation features only
+              -- for projects that are relevant to code that is being edited.
+              LoadProjectsOnDemand = false,
+            },
+          },
+        },
       },
     },
     config = function(_, opts)
       require("mason").setup()
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "rust_analyzer" },
+        ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp" },
         automatic_installation = true,
       })
 
@@ -62,8 +89,18 @@ return {
           if client then
             require("workspace-diagnostics").setup({
               workspace_files = function()
-                return vim.fn.systemlist(
-                "find . -name '*.rs' -o -name '*.lua' -o -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.tsx' | head -1000")
+                -- Cross-platform file finding
+                if vim.fn.has('win32') == 1 then
+                  -- Windows PowerShell command
+                  return vim.fn.systemlist(
+                    'powershell -Command "Get-ChildItem -Recurse -Include *.rs,*.lua,*.py,*.js,*.ts,*.tsx | Select-Object -First 1000 | ForEach-Object { $_.FullName }"'
+                  )
+                else
+                  -- Unix/Linux/macOS command
+                  return vim.fn.systemlist(
+                    "find . -name '*.rs' -o -name '*.lua' -o -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.tsx' | head -1000"
+                  )
+                end
               end
             })
             -- Auto-populate workspace diagnostics when LSP attaches
@@ -73,15 +110,20 @@ return {
           -- Buffer local mappings
           local opts = { buffer = ev.buf }
 
-          -- Navigation
+          -- Navigation with Telescope (live preview)
+          local telescope = require('telescope.builtin')
           vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = 'Go to declaration' })
-          vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = 'Go to definition' })
-          vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = ev.buf, desc = 'Go to implementation' })
-          vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition,
+          vim.keymap.set("n", "gd", telescope.lsp_definitions, { buffer = ev.buf, desc = 'Go to definition' })
+          vim.keymap.set("n", "gi", telescope.lsp_implementations, { buffer = ev.buf, desc = 'Go to implementation' })
+          vim.keymap.set("n", "<leader>D", telescope.lsp_type_definitions,
             { buffer = ev.buf, desc = 'Go to type definition' })
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = 'Rename buffer' })
           vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'Code actions' })
-          vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = ev.buf, desc = 'Go to references' })
+          vim.keymap.set("n", "gr", telescope.lsp_references, { buffer = ev.buf, desc = 'Go to references' })
+          
+          -- Additional LSP Telescope commands with live preview
+          vim.keymap.set("n", "<leader>ls", telescope.lsp_document_symbols, { buffer = ev.buf, desc = 'Document symbols' })
+          vim.keymap.set("n", "<leader>lw", telescope.lsp_workspace_symbols, { buffer = ev.buf, desc = 'Workspace symbols' })
 
           -- Documentation
           vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = ev.buf, desc = 'Hover Documentation' })

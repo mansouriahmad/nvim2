@@ -1,7 +1,7 @@
 local plugins = {
   require('plugins.colorschemes'),
   require('plugins.treesitter'),
-  require('plugins.nvim-tree'),
+  require('plugins.file-explorer'),
   require('plugins.telescope'),
   require('plugins.lsp'),
   require('plugins.vim-tmux-navigator'),
@@ -12,7 +12,8 @@ local plugins = {
   require('plugins.misc'),
   require('plugins.lualine'),
   require('plugins.which-key'),
-  require('plugins.mini-indentscope')
+  require('plugins.mini-indentscope'),
+  require('plugins.fugitive')
 }
 
 local opts = {

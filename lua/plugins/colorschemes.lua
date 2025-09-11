@@ -125,7 +125,6 @@ return {
           -- ... and many more
         },
       })
-      vim.cmd.colorscheme('catppuccin')
     end,
   },
 }

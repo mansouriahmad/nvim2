@@ -1,7 +1,7 @@
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
-local opts = { noremap = true, silent = true}
+local opts = { noremap = true, silent = true }
 local term_opts = { silent = true }
 
 -- Shorten function name
@@ -39,8 +39,8 @@ vim.keymap.set('n', '<right>', ':bn<cr>', { desc = 'Next buffer' })
 --vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- FIXED: Consistent line movement in normal mode
-vim.keymap.set("n", "<leader>j", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down"})
-vim.keymap.set("n", "<leader>k", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up"})
+vim.keymap.set("n", "<leader>j", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
+vim.keymap.set("n", "<leader>k", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
 
 -- FIXED: Consistent line movement in visual mode
 vim.keymap.set("x", "<leader>j", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
@@ -60,14 +60,14 @@ vim.keymap.set('n', 'j', 'gj')
 vim.keymap.set('n', 'k', 'gk')
 
 -- Handy keymap for replacing up to next _ (like in variable names)
-vim.keymap.set('n', '<leader>m', 'ct_', { desc = 'Delete until next _'})
+vim.keymap.set('n', '<leader>m', 'ct_', { desc = 'Delete until next _' })
 
 -- F1 is pretty close to Esc, so you probably meant Esc
 vim.keymap.set('', '<F1>', '<Esc>')
-vim.keymap.set('i', '<F1>', '<Esc>')      
+vim.keymap.set('i', '<F1>', '<Esc>')
 
 -- Save all files
-vim.keymap.set('n', '<leader>a', ':wa<CR>', { noremap = true, silent = true, desc = 'Save all files'} )
+vim.keymap.set('n', '<leader>a', ':wa<CR>', { noremap = true, silent = true, desc = 'Save all files' })
 
 -- More useful diffs (nvim -d) by ignoring whitespace
 vim.opt.diffopt:append('iwhite')
@@ -76,7 +76,7 @@ vim.opt.diffopt:append('iwhite')
 vim.keymap.set('', '<C-p>', '<cmd>Files<cr>')
 
 -- Show/hide hidden characters
-vim.keymap.set('n', '<leader>,', ':set invlist<cr>', {desc= 'Toggle list mode'})
+vim.keymap.set('n', '<leader>,', ':set invlist<cr>', { desc = 'Toggle list mode' })
 
 -- Always center search results
 vim.keymap.set('n', 'n', 'nzz', { silent = true })

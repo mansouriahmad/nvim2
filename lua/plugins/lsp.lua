@@ -74,9 +74,20 @@ return {
         vim.lsp.enable(server)
       end
 
+      -- Virtual lines toggle state
+      local virtual_lines_enabled = false
+      
+      -- Function to toggle virtual lines
+      local function toggle_virtual_lines()
+        virtual_lines_enabled = not virtual_lines_enabled
+        vim.diagnostic.config({
+          virtual_lines = virtual_lines_enabled,
+        })
+      end
+
       vim.diagnostic.config({
         --virtual_text = true,
-        virtual_lines = true,
+        virtual_lines = virtual_lines_enabled,
         --underline = true
       })
 
@@ -135,6 +146,9 @@ return {
               border = "rounded",
             })
           end, { buffer = ev.buf, desc = 'Open float diagnostic' })
+
+          -- Toggle virtual lines diagnostics
+          vim.keymap.set("n", "<leader>vl", toggle_virtual_lines, { buffer = ev.buf, desc = 'Toggle virtual lines diagnostics' })
         end,
       })
     end

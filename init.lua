@@ -1,6 +1,5 @@
 -- Enhanced init.lua
 -- Performance monitoring start
-local start_time = vim.loop.hrtime()
 
 -- Load core configuration
 require 'options'
@@ -23,4 +22,3 @@ require 'selected-theme'
 -- Windows compatibility: Ensure PowerShell is set as the default shell in plugins/toggleterm.lua
 -- Some plugins may require additional setup or dependencies on Windows (see plugin configs)
 vim.o.background = "dark"
-

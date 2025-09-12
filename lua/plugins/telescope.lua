@@ -7,13 +7,20 @@ return {
   --},
   tag = '0.1.8',
   lazy = false,
-  dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-ui-select.nvim' },
+  dependencies = {
+    'nvim-lua/plenary.nvim',
+    'nvim-telescope/telescope-ui-select.nvim',
+    {
+      'nvim-telescope/telescope-fzf-native.nvim',
+      build = 'make'
+    }
+  },
   config = function()
     require("telescope").setup({
       defaults = {
         preview = {
           filesize_limit = 0.1, -- MB
-          timeout = 250, -- ms
+          timeout = 250,        -- ms
         },
         layout_strategy = 'flex',
         layout_config = {
@@ -47,6 +54,9 @@ return {
             ["<C-d>"] = "preview_scrolling_down",
           },
         },
+      },
+      extensions = {
+        fzf = {}
       },
       pickers = {
         live_grep = {
@@ -160,20 +170,72 @@ return {
         },
       },
     })
-    
+
     require("telescope").load_extension("ui-select")
+    require('telescope').load_extension('fzf')
+
+
     local builtin = require 'telescope.builtin'
     vim.keymap.set('n', '<leader>sg', builtin.live_grep)
     vim.keymap.set('n', '<leader>sf', builtin.find_files)
-    
+    vim.keymap.set('n', '<leader>sh', builtin.help_tags)
+    vim.keymap.set('n', '<leader>sk', builtin.keymaps)
+    vim.keymap.set('n', '<leader>sF', builtin.filetypes)
+
+    vim.keymap.set('n', '<leader>egS', function()
+      require('telescope.builtin').git_status({
+        prompt_title = "Git Status - Changed Files",
+        attach_mappings = function(_, map)
+          -- Open side-by-side diff with <C-d>
+          map('i', '<C-v>', function(prompt_bufnr)
+            local selection = require('telescope.actions.state').get_selected_entry()
+            require('telescope.actions').close(prompt_bufnr)
+            vim.cmd('Gdiffsplit ' .. selection.value)
+          end)
+
+          -- Stage file with <C-a> (add)
+          map('i', '<C-a>', function(prompt_bufnr)
+            local selection = require('telescope.actions.state').get_selected_entry()
+            require('telescope.actions').close(prompt_bufnr)
+            vim.cmd('Git add ' .. selection.value)
+            vim.notify('Staged: ' .. selection.value, vim.log.levels.INFO)
+          end)
+
+          -- Unstage file with <C-u> (unstage)
+          map('i', '<C-u>', function(prompt_bufnr)
+            local selection = require('telescope.actions.state').get_selected_entry()
+            require('telescope.actions').close(prompt_bufnr)
+            vim.cmd('Git reset ' .. selection.value)
+            vim.notify('Unstaged: ' .. selection.value, vim.log.levels.INFO)
+          end)
+
+          -- Open file in new tab with <C-t>
+          map('i', '<C-t>', function(prompt_bufnr)
+            local selection = require('telescope.actions.state').get_selected_entry()
+            require('telescope.actions').close(prompt_bufnr)
+            vim.cmd('tabnew ' .. selection.value)
+          end)
+
+          return true
+        end
+      })
+    end, { desc = 'Enhanced Git Status with Telescope' })
+
+
+    vim.keymap.set('n', "<leader>sn", function()
+      require('telescope.builtin').find_files {
+        cwd = vim.fn.stdpath("config")
+      }
+    end
+    )
     -- ============================================
-    -- THEME SWITCHER WITH REAL-TIME PREVIEW 
+    -- THEME SWITCHER WITH REAL-TIME PREVIEW
     -- ============================================
-    
+
     -- Main theme switcher with live preview (like NvChad)
     vim.keymap.set('n', '<leader>th', function()
       builtin.colorscheme({
-        enable_preview = true,  -- This enables real-time preview as you navigate!
+        enable_preview = true, -- This enables real-time preview as you navigate!
       })
     end, { desc = '[T]heme selector with live preview' })
 
@@ -194,9 +256,9 @@ return {
       'rose-pine',
       'catppuccin',
     }
-    
+
     local current_theme_index = 1
-    
+
     -- Cycle to next theme with notification
     vim.keymap.set('n', '<leader>tn', function()
       current_theme_index = current_theme_index % #favorite_themes + 1
@@ -204,7 +266,7 @@ return {
       vim.cmd.colorscheme(theme)
       vim.notify('Theme: ' .. theme, vim.log.levels.INFO)
     end, { desc = 'Cycle to [N]ext theme' })
-    
+
     -- Show only favorite themes
     vim.keymap.set('n', '<leader>tf', function()
       builtin.colorscheme({

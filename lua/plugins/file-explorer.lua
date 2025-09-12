@@ -1,4 +1,26 @@
 return {
+  {
+    'stevearc/oil.nvim',
+    -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
+    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+    config = function()
+      require('oil').setup {
+        columns = { "icon" },
+        keymaps = {
+          ["<C-h>"] = false,
+          ["<M-h>"] = "actions.select_split"
+        },
+        vim_options = {
+          show_hidden = true,
+        }
+      }
+      vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open current directory" })
+      vim.keymap.set("n", "<leader>-", require("oil").toggle_float)
+    end,
+    lazy = false,
+
+  },
   -- {
   --   'stevearc/oil.nvim',
   --   ---@module 'oil'
@@ -142,27 +164,27 @@ return {
   --   -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
   --   lazy = false,
   -- },
-  {
-    "nvim-tree/nvim-tree.lua",
-    version = "*",
-    lazy = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("nvim-tree").setup {
-        on_attach = function(bufnr)
-          local api = require("nvim-tree.api")
+  -- {
+  --   "nvim-tree/nvim-tree.lua",
+  --   version = "*",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-tree/nvim-web-devicons",
+  --   },
+  --   config = function()
+  --     require("nvim-tree").setup {
+  --       on_attach = function(bufnr)
+  --         local api = require("nvim-tree.api")
 
-          -- Default mappings
-          api.config.mappings.default_on_attach(bufnr)
+  --         -- Default mappings
+  --         api.config.mappings.default_on_attach(bufnr)
 
-          -- Remove conflicting mappings if they exist
-          pcall(vim.keymap.del, 'n', '<C-j>', { buffer = bufnr })
-          pcall(vim.keymap.del, 'n', '<C-k>', { buffer = bufnr })
-        end,
-      }
-    end
+  --         -- Remove conflicting mappings if they exist
+  --         pcall(vim.keymap.del, 'n', '<C-j>', { buffer = bufnr })
+  --         pcall(vim.keymap.del, 'n', '<C-k>', { buffer = bufnr })
+  --       end,
+  --     }
+  --   end
 
-  }
+  -- }
 }

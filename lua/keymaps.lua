@@ -2,10 +2,7 @@
 --  See `:help vim.keymap.set()`
 
 local opts = { noremap = true, silent = true }
-local term_opts = { silent = true }
 
--- Shorten function name
-local keymap = vim.api.nvim_set_keymap
 
 vim.keymap.set("n", "<Space>", "<Nop>", opts)
 vim.g.mapleader = ' '
@@ -15,7 +12,7 @@ vim.g.maplocalleader = ' '
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
-vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
+-- vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
 
 -- Quick navigation shortcuts
 vim.keymap.set('', 'H', '^')
@@ -84,6 +81,11 @@ vim.keymap.set('n', 'N', 'Nzz', { silent = true })
 vim.keymap.set('n', '*', '*zz', { silent = true })
 vim.keymap.set('n', '#', '#zz', { silent = true })
 vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
+
+
+-- in your init.lua or a lua config file
+vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
+vim.keymap.set("i", "jk", "<Esc>", { noremap = true, silent = true })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`

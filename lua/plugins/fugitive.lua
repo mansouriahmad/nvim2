@@ -14,7 +14,7 @@ return {
     vim.keymap.set('n', '<leader>gL', function()
       vim.cmd.Git('pull')
     end, { desc = 'Git [L]ull' })
-    
+
     -- Diff operations
     vim.keymap.set('n', '<leader>gD', function()
       vim.cmd.Gdiffsplit()
@@ -31,7 +31,7 @@ return {
     vim.keymap.set('n', '<leader>gLog', function()
       vim.cmd.Git('log')
     end, { desc = 'Git [L]og' })
-    
+
     -- Advanced diff operations
     vim.keymap.set('n', '<leader>gdf', function()
       vim.cmd.Git('diff')
@@ -45,12 +45,12 @@ return {
     vim.keymap.set('n', '<leader>gdm', function()
       vim.cmd.Git('diff main')
     end, { desc = 'Git [D]iff vs [M]ain branch' })
-    
+
     -- Quick commit workflow
     vim.keymap.set('n', '<leader>gcc', function()
       vim.cmd.Git('commit -m "')
     end, { desc = 'Git [C]ommit with [C]ustom message' })
-    
+
     -- Merge and rebase operations
     vim.keymap.set('n', '<leader>gM', function()
       vim.cmd.Git('merge')
@@ -58,7 +58,7 @@ return {
     vim.keymap.set('n', '<leader>gR', function()
       vim.cmd.Git('rebase')
     end, { desc = 'Git [R]ebase' })
-    
+
     -- Stash operations
     vim.keymap.set('n', '<leader>gSt', function()
       vim.cmd.Git('stash')
@@ -131,7 +131,7 @@ return {
         vim.keymap.set('n', 'ca', function()
           vim.cmd('Git commit --amend')
         end, { buffer = true, desc = 'Amend commit' })
-        
+
         vim.keymap.set('n', 'cA', function()
           vim.cmd('Git commit --amend --no-edit')
         end, { buffer = true, desc = 'Amend commit (no edit)' })

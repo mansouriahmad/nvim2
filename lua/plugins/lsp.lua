@@ -107,9 +107,6 @@ return {
             require("workspace-diagnostics").populate_workspace_diagnostics(client, ev.buf)
           end
 
-          -- Buffer local mappings
-          local opts = { buffer = ev.buf }
-
           -- Navigation with Telescope (live preview)
           local telescope = require('telescope.builtin')
           vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = 'Go to declaration' })
@@ -120,10 +117,12 @@ return {
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = 'Rename buffer' })
           vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'Code actions' })
           vim.keymap.set("n", "gr", telescope.lsp_references, { buffer = ev.buf, desc = 'Go to references' })
-          
+
           -- Additional LSP Telescope commands with live preview
-          vim.keymap.set("n", "<leader>ls", telescope.lsp_document_symbols, { buffer = ev.buf, desc = 'Document symbols' })
-          vim.keymap.set("n", "<leader>lw", telescope.lsp_workspace_symbols, { buffer = ev.buf, desc = 'Workspace symbols' })
+          vim.keymap.set("n", "<leader>ls", telescope.lsp_document_symbols,
+            { buffer = ev.buf, desc = 'Document symbols' })
+          vim.keymap.set("n", "<leader>lw", telescope.lsp_workspace_symbols,
+            { buffer = ev.buf, desc = 'Workspace symbols' })
 
           -- Documentation
           vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = ev.buf, desc = 'Hover Documentation' })

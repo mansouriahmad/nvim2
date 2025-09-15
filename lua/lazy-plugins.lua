@@ -4,6 +4,7 @@ local plugins = {
   require('plugins.file-explorer'),
   require('plugins.telescope'),
   require('plugins.lsp'),
+  require('plugins.rust-debug'),
   require('plugins.vim-tmux-navigator'),
   require('plugins.blink'),
   require('plugins.conform'),

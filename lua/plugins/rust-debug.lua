@@ -346,6 +346,13 @@ return {
       dap.listeners.before.event_exited["dapui_config"] = function()
         dapui.close()
       end
+      -- Close UI when session completes normally
+      dap.listeners.after.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.after.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
 
       -- Enhanced keymaps for debugging
       local keymap = vim.keymap.set

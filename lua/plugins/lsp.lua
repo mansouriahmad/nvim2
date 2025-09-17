@@ -57,6 +57,12 @@ return {
               -- for projects that are relevant to code that is being edited.
               LoadProjectsOnDemand = false,
             },
+            -- Enable auto-import suggestions
+            EnableImportCompletion = true,
+            -- Enable code actions for adding using statements
+            EnableRoslynAnalyzers = true,
+            -- Enable semantic highlighting
+            EnableSemanticHighlighting = true,
           },
         },
       },
@@ -65,7 +71,7 @@ return {
       require("mason").setup()
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp" },
+        ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp"},
         automatic_installation = true,
       })
 
@@ -127,6 +133,16 @@ return {
             { buffer = ev.buf, desc = 'Go to type definition' })
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = 'Rename buffer' })
           vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'Code actions' })
+          
+          -- C# specific: Fix using statements (auto-import)
+          if client.name == "omnisharp" then
+            vim.keymap.set("n", "<leader>fu", function()
+              vim.lsp.buf.code_action({
+                context = { only = { "source.organizeImports" } },
+                apply = true,
+              })
+            end, { buffer = ev.buf, desc = 'Fix using statements (auto-import)' })
+          end
           vim.keymap.set("n", "gr", telescope.lsp_references, { buffer = ev.buf, desc = 'Go to references' })
 
           -- Additional LSP Telescope commands with live preview

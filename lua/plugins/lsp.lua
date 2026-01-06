@@ -91,10 +91,38 @@ return {
         })
       end
 
+      -- All diagnostics toggle state (enabled by default)
+      local diagnostics_enabled = true
+      
+      -- Function to toggle all diagnostics (virtual text, underline, signs, virtual lines)
+      local function toggle_all_diagnostics()
+        diagnostics_enabled = not diagnostics_enabled
+        if diagnostics_enabled then
+          -- Re-enable all diagnostics, restore virtual_lines to its previous state
+          vim.diagnostic.config({
+            virtual_text = true,
+            underline = true,
+            signs = true,
+            virtual_lines = virtual_lines_enabled,
+          })
+          vim.notify("Diagnostics enabled", vim.log.levels.INFO)
+        else
+          -- Disable all diagnostics
+          vim.diagnostic.config({
+            virtual_text = false,
+            underline = false,
+            signs = false,
+            virtual_lines = false,
+          })
+          vim.notify("Diagnostics disabled", vim.log.levels.INFO)
+        end
+      end
+
       vim.diagnostic.config({
-        --virtual_text = true,
+        virtual_text = true,
         virtual_lines = virtual_lines_enabled,
-        --underline = true
+        underline = true,
+        signs = true,
       })
 
       -- Set up LSP keymaps using LspAttach autocommand (recommended approach)
@@ -143,7 +171,15 @@ return {
               })
             end, { buffer = ev.buf, desc = 'Fix using statements (auto-import)' })
           end
-          vim.keymap.set("n", "gr", telescope.lsp_references, { buffer = ev.buf, desc = 'Go to references' })
+          -- Faster references: disable previewer and skip declarations
+          vim.keymap.set("n", "gr", function()
+            telescope.lsp_references({
+              previewer = false,           -- avoid heavy preview rendering
+              include_declarations = false, -- often not needed and slows down
+              show_line = false,           -- lighter entries
+              trim_text = true,
+            })
+          end, { buffer = ev.buf, desc = 'Go to references' })
 
           -- Additional LSP Telescope commands with live preview
           vim.keymap.set("n", "<leader>ls", telescope.lsp_document_symbols,
@@ -167,6 +203,9 @@ return {
           vim.keymap.set("n", "<leader>vl", toggle_virtual_lines, { buffer = ev.buf, desc = 'Toggle virtual lines diagnostics' })
         end,
       })
+      
+      -- Global keymap for diagnostics toggle (works everywhere, even when LSP not attached)
+      vim.keymap.set("n", "<leader>dt", toggle_all_diagnostics, { desc = 'Toggle all diagnostics' })
     end
   }
 }

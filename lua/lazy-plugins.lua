@@ -13,7 +13,8 @@ local plugins = {
   require('plugins.lualine'),
   require('plugins.which-key'),
   require('plugins.mini-indentscope'),
-  require('plugins.git')
+  require('plugins.git'),
+  require('plugins.crates'),
 }
 
 local opts = {

@@ -45,7 +45,7 @@ return {
           ["."] = false,
           ["*"] = true, -- Enable for all other filetypes
         },
-        copilot_node_command = "node", -- Node.js version must be > 18.x
+        copilot_node_command = "node", -- Node.js version must be v22+ for recent copilot.lua
         server_opts_overrides = {},
       })
     end,
@@ -61,48 +61,33 @@ return {
       debug = false, -- Enable debugging
       model = 'claude-sonnet-4.5', -- GPT-4, GPT-4o, o1-preview, o1-mini, claude-3.5-sonnet, or claude-sonnet-4.5
       temperature = 0.1,
+      
+      -- Enable agent mode - this is the key setting for tool calling
+      agent = 'copilot',
+      
+      -- Additional context for better agent behavior
+      context = 'buffer', -- Include current buffer content by default
 
-      -- Agent-like experience settings
-      question_header = '## User ',
-      answer_header = '## Copilot ',
-      error_header = '## Error ',
+      -- UX
+      auto_insert_mode = true, -- Enter insert mode when opening chat
 
+      -- Headers (modern config)
+      headers = {
+        user = '## User',
+        assistant = '## Copilot',
+        tool = '## Tool',
+      },
+
+      -- Keep prompt templates simple; rely on built-in prompts (Explain/Review/Fix/etc.)
+      -- and add a dedicated "Change" prompt that encourages tool-calling edits.
       prompts = {
-        Explain = {
-          prompt = '/COPILOT_EXPLAIN Write an explanation for the active selection as paragraphs of text.',
+        Change = {
+          prompt = '@copilot You are an expert coding agent with tool-calling abilities. Apply the requested change to the code. Use tools to make edits directly. Context: /COPILOT_GENERATE',
+          description = "Apply requested change to code (uses agent mode)",
         },
-        Review = {
-          prompt = '/COPILOT_REVIEW Review the selected code.',
-        },
-        Fix = {
-          prompt = '/COPILOT_FIX There is a problem in this code. Rewrite the code to show it with the bug fixed.',
-        },
-        Optimize = {
-          prompt = '/COPILOT_REFACTOR Optimize the selected code to improve performance and readability.',
-        },
-        Docs = {
-          prompt = '/COPILOT_DOCS Please add documentation comment for the selection.',
-        },
-        Tests = {
-          prompt = '/COPILOT_TESTS Please generate tests for my code.',
-        },
-        FixDiagnostic = {
-          prompt = 'Please assist with the following diagnostic issue in file:',
-          selection = function(source)
-            return require('CopilotChat.select').diagnostics(source)
-          end,
-        },
-        Commit = {
-          prompt = 'Write commit message for the change with commitizen convention. Make sure the title has maximum 50 characters and message is wrapped at 72 characters. Wrap the whole message in code block with language gitcommit.',
-          selection = function(source)
-            return require('CopilotChat.select').gitdiff(source)
-          end,
-        },
-        CommitStaged = {
-          prompt = 'Write commit message for the change with commitizen convention. Make sure the title has maximum 50 characters and message is wrapped at 72 characters. Wrap the whole message in code block with language gitcommit.',
-          selection = function(source)
-            return require('CopilotChat.select').gitdiff(source, true)
-          end,
+        Agent = {
+          prompt = '@copilot /COPILOT_GENERATE',
+          description = "Agent mode with full tool access",
         },
       },
 
@@ -159,7 +144,6 @@ return {
     },
     config = function(_, opts)
       local chat = require("CopilotChat")
-      local select = require("CopilotChat.select")
 
       -- Setup CopilotChat with options
       chat.setup(opts)
@@ -182,10 +166,39 @@ return {
         function()
           local input = vim.fn.input("Quick Chat: ")
           if input ~= "" then
-            require("CopilotChat").ask(input, { selection = require("CopilotChat.select").buffer })
+            require("CopilotChat").open()
+            require("CopilotChat").ask("@copilot " .. input, {
+              sticky = { "#buffer:active" },
+            })
           end
         end,
         desc = "CopilotChat - Quick chat",
+      },
+      {
+        "<leader>ax",
+        function()
+          local input = vim.fn.input("Change (applies to current file): ")
+          if input ~= "" then
+            require("CopilotChat").open()
+            require("CopilotChat").ask("/Change\n#buffer:active\n" .. input, {
+              -- Tools only become available when @copilot is used in the resolved prompt,
+              -- which /Change includes.
+            })
+          end
+        end,
+        desc = "CopilotChat - Apply change to file",
+      },
+      {
+        "<leader>ax",
+        function()
+          local input = vim.fn.input("Change (applies to selection): ")
+          if input ~= "" then
+            require("CopilotChat").open()
+            require("CopilotChat").ask("/Change\n#selection\n" .. input)
+          end
+        end,
+        mode = { "v" },
+        desc = "CopilotChat - Apply change to selection",
       },
       -- Open chat
       {

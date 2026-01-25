@@ -50,7 +50,7 @@ return {
           show_token_count = true, -- Show token count in chat buffer
         },
         diff = {
-          provider = "mini_diff", -- default|mini_diff
+          provider = "default", -- default|mini_diff
         },
       },
       opts = {

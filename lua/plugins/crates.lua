@@ -14,7 +14,7 @@ return {
       })
 
       local crates = require("crates")
-      
+
       -- Only set keymaps for functions that exist
       if crates.upgrade_crate then
         vim.keymap.set("n", "<leader>cu", crates.upgrade_crate, { silent = true, desc = "Upgrade crate" })

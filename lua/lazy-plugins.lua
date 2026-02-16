@@ -15,6 +15,7 @@ local plugins = {
   require('plugins.mini-indentscope'),
   require('plugins.git'),
   require('plugins.crates'),
+  require('plugins.rustaceanvim'),
   require('plugins.copilot'),
   require('plugins.codecompanion'),
 }

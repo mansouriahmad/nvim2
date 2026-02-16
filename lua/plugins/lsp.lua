@@ -17,21 +17,6 @@ return {
             },
           },
         },
-        rust_analyzer = {
-          settings = {
-            ["rust-analyzer"] = {
-              cargo = {
-                allFeatures = true,
-              },
-              check = {
-                command = "clippy",
-              },
-              procMacro = {
-                enable = true,
-              },
-            },
-          },
-        },
         ruff = {
           init_options = {
             settings = {
@@ -65,13 +50,25 @@ return {
             EnableSemanticHighlighting = true,
           },
         },
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "basic",
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+              },
+            },
+          },
+        },
+        taplo = {}
       },
     },
     config = function(_, opts)
       require("mason").setup()
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp"},
+        ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp", "pyright", "taplo" },
         automatic_installation = true,
       })
 
@@ -82,7 +79,7 @@ return {
 
       -- Virtual lines toggle state
       local virtual_lines_enabled = false
-      
+
       -- Function to toggle virtual lines
       local function toggle_virtual_lines()
         virtual_lines_enabled = not virtual_lines_enabled
@@ -93,7 +90,7 @@ return {
 
       -- All diagnostics toggle state (enabled by default)
       local diagnostics_enabled = true
-      
+
       -- Function to toggle all diagnostics (virtual text, underline, signs, virtual lines)
       local function toggle_all_diagnostics()
         diagnostics_enabled = not diagnostics_enabled
@@ -161,7 +158,7 @@ return {
             { buffer = ev.buf, desc = 'Go to type definition' })
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = 'Rename buffer' })
           vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = 'Code actions' })
-          
+
           -- C# specific: Fix using statements (auto-import)
           if client.name == "omnisharp" then
             vim.keymap.set("n", "<leader>fu", function()
@@ -174,9 +171,9 @@ return {
           -- Faster references: disable previewer and skip declarations
           vim.keymap.set("n", "gr", function()
             telescope.lsp_references({
-              previewer = false,           -- avoid heavy preview rendering
+              previewer = false,            -- avoid heavy preview rendering
               include_declarations = false, -- often not needed and slows down
-              show_line = false,           -- lighter entries
+              show_line = false,            -- lighter entries
               trim_text = true,
             })
           end, { buffer = ev.buf, desc = 'Go to references' })
@@ -200,10 +197,11 @@ return {
           end, { buffer = ev.buf, desc = 'Open float diagnostic' })
 
           -- Toggle virtual lines diagnostics
-          vim.keymap.set("n", "<leader>vl", toggle_virtual_lines, { buffer = ev.buf, desc = 'Toggle virtual lines diagnostics' })
+          vim.keymap.set("n", "<leader>vl", toggle_virtual_lines,
+            { buffer = ev.buf, desc = 'Toggle virtual lines diagnostics' })
         end,
       })
-      
+
       -- Global keymap for diagnostics toggle (works everywhere, even when LSP not attached)
       vim.keymap.set("n", "<leader>dt", toggle_all_diagnostics, { desc = 'Toggle all diagnostics' })
     end

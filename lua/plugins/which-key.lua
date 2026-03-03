@@ -175,6 +175,8 @@ return {
       { "<leader>dp", desc = "Preview" },
       { "<leader>dR", desc = "Debug Rust Target (picker)" },
       { "<leader>dt", desc = "Debug Test Under Cursor" },
+      { "<leader>dN", desc = ".NET Debug (auto‑detect dll)" },
+
     })
 
     -- Session keymaps

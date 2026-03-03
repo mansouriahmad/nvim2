@@ -76,6 +76,28 @@ return {
         },
       })
 
+      -- OS-agnostic and .NET-version-agnostic OmniSharp binary lookup.  Mason
+      -- packages OmniSharp in a cross-platform way, but the executable name and
+      -- whether we run the shell script or the .exe differs by OS.  Fall back to
+      -- whatever is on $PATH if Mason hasn’t installed it yet.
+      local function get_omnisharp_cmd()
+        local base = vim.fn.stdpath("data") .. "/mason/packages/omnisharp"
+        local exe = "OmniSharp"
+        if vim.fn.has("win32") == 1 then
+          exe = "OmniSharp.exe"
+        end
+        local candidate = base .. "/" .. exe
+        if vim.fn.executable(candidate) == 1 then
+          return { candidate, "--languageserver", "--hostPID", tostring(vim.fn.getpid()) }
+        end
+        -- Fallback to whatever the user has in PATH (may be managed externally).
+        return { "omnisharp", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) }
+      end
+
+      -- ensure there is an entry to modify; nil value means default settings
+      opts.servers.omnisharp = opts.servers.omnisharp or {}
+      opts.servers.omnisharp.cmd = get_omnisharp_cmd()
+
       for server, config in pairs(opts.servers) do
         vim.lsp.config(server, config)
         vim.lsp.enable(server)

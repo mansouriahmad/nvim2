@@ -273,6 +273,85 @@ return {
         end, { desc = "Set Python for debugger" })
       end
 
+      -- .NET / C# debugger (netcoredbg)
+      -- try to discover a suitable adapter in an OS‑independent way; prefer
+      -- Mason's copy but fall back to whatever is on PATH, and warn if neither
+      -- is available.
+      local function find_netcoredbg()
+        local mason_base = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg"
+        local exe = "netcoredbg"
+        if vim.fn.has("win32") == 1 then
+          exe = "netcoredbg.exe"
+        end
+        local candidate = mason_base .. "/" .. exe
+        if vim.fn.executable(candidate) == 1 then
+          return candidate
+        end
+        local path = vim.fn.exepath("netcoredbg")
+        if path ~= "" then
+          return path
+        end
+        return nil
+      end
+
+      local netcoredbg_path = find_netcoredbg()
+      if not netcoredbg_path then
+        vim.notify("netcoredbg not found! Run :MasonInstall netcoredbg or add it to your PATH", vim.log.levels.WARN)
+        netcoredbg_path = "netcoredbg" -- let DAP attempt to execute it anyway
+      end
+
+      dap.adapters.netcoredbg = {
+        type = "executable",
+        command = netcoredbg_path,
+        args = { "--interpreter=vscode" },
+      }
+
+      -- collect all plausible DLLs under bin/**/*/net*/*.dll
+      -- this is intentionally broad; we’ll let the user choose the right one.
+      local function find_dotnet_dlls()
+        local cwd = vim.fn.getcwd()
+        local base = cwd .. "/bin"
+        -- globpath returns a list when the final argument is true
+        local dlls = vim.fn.globpath(base, "**/net*/*.dll", false, true)
+        if not dlls or vim.tbl_isempty(dlls) then
+          vim.notify("No DLLs found under bin/ – make sure the project has been built", vim.log.levels.INFO)
+          return {}
+        end
+        return dlls
+      end
+
+      -- prompt the user with a picker if there are multiple candidates
+      local function choose_from_list(list, prompt)
+        if not list or #list == 0 then
+          return nil
+        elseif #list == 1 then
+          return list[1]
+        end
+        local choice = nil
+        vim.ui.select(list, { prompt = prompt }, function(item)
+          choice = item
+        end)
+        return choice
+      end
+
+      dap.configurations.cs = {
+        {
+          type = "netcoredbg",
+          name = "Launch .NET",
+          request = "launch",
+          program = function()
+            local candidates = find_dotnet_dlls()
+            local dll = choose_from_list(candidates, "Select DLL to debug:")
+            if dll then
+              return dll
+            end
+            return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+      }
+
       -- codelldb adapter (used by Rust, C, C++)
       -- Auto-detect codelldb from Mason install path or fall back to PATH
       local codelldb_path = "codelldb"
@@ -491,13 +570,84 @@ return {
       vim.keymap.set("n", "<leader>dR", rust_debug_picker, { desc = "Debug Rust Target (picker)" })
       vim.keymap.set("n", "<leader>dt", rust_debug_test_under_cursor, { desc = "Debug Test Under Cursor" })
 
-      -- C/C++ still uses manual path selection
+      -- .NET launch helper using the fuzzy picker logic
+      vim.keymap.set("n", "<leader>dN", function()
+        local candidates = find_dotnet_dlls()
+        local dll = choose_from_list(candidates, "Select DLL to debug:")
+        dap.run({
+          type = "netcoredbg",
+          name = "Launch .NET",
+          request = "launch",
+          program = dll or vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file"),
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        })
+      end, { desc = ".NET debug (auto‑detect dll)" })
+      -- build-and-debug helper invoked on F5
+      local function build_and_debug()
+        -- if a session already exists, just continue/resume it
+        if dap.session() then
+          dap.continue()
+          return
+        end
+
+        local ft = vim.bo.filetype
+        if ft == "rust" then
+          -- rust_debug_picker already builds & starts
+          rust_debug_picker()
+        elseif ft == "cs" or ft == "csharp" then
+          -- ensure dotnet CLI is available
+          if vim.fn.exepath("dotnet") == "" then
+            vim.notify("dotnet CLI not found; cannot build project", vim.log.levels.ERROR)
+          else
+            vim.notify("dotnet build (Debug) invoked", vim.log.levels.INFO)
+            vim.fn.system("dotnet build -c Debug")
+          end
+          -- replicate the picker logic from the main configuration
+          local candidates = find_dotnet_dlls()
+          local dll = choose_from_list(candidates, "Select DLL to debug:")
+          dap.run({
+            type = "netcoredbg",
+            name = "Launch .NET",
+            request = "launch",
+            program = dll or vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file"),
+            cwd = "${workspaceFolder}",
+            stopOnEntry = false,
+          })
+        else
+          -- fallback to continue (attach or restart) for other languages
+          dap.continue()
+        end
+      end
+      -- override F5 to build & start where appropriate
+      vim.keymap.set("n", "<F5>", build_and_debug, { desc = "Build + Debug" })
+
+      -- C/C++ still uses manual path selection; offer fuzzy pick if multiple
+      local function choose_executable(default_dir)
+        -- look for binaries under target/debug, target/release, or current dir
+        local search = vim.fn.glob(default_dir .. "**/*", false, true)
+        if type(search) == "string" then
+          search = vim.split(search, "\n")
+        end
+        local files = {}
+        for _, f in ipairs(search) do
+          if vim.fn.executable(f) == 1 then
+            table.insert(files, f)
+          end
+        end
+        return choose_from_list(files, "Select executable to debug:")
+      end
+
       dap.configurations.c = {
         {
           name = "Launch",
           type = "codelldb",
           request = "launch",
           program = function()
+            local exe = choose_executable(vim.fn.getcwd() .. "/")
+            if exe then
+              return exe
+            end
             return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
           end,
           cwd = "${workspaceFolder}",

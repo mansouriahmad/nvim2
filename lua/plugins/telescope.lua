@@ -194,7 +194,7 @@ return {
     vim.keymap.set('n', '<leader>gs', builtin.git_status)
     vim.keymap.set('n', '<leader>gc', builtin.git_commits)
     vim.keymap.set('n', '<leader>gr', builtin.git_branches)
-    vim.keymap.set('n', '<leader>gS', builtin.git_stash)
+    vim.keymap.set('n', '<leader>gss', builtin.git_stash)
 
     vim.keymap.set('n', '<leader>egS', function()
       require('telescope.builtin').git_status({

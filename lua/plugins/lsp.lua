@@ -70,6 +70,10 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = { "lua_ls", "rust_analyzer", "ruff", "omnisharp", "pyright", "taplo" },
         automatic_installation = true,
+        -- rust_analyzer is managed by rustaceanvim — don't let mason-lspconfig start it
+        automatic_enable = {
+          exclude = { "rust_analyzer" },
+        },
       })
 
       for server, config in pairs(opts.servers) do

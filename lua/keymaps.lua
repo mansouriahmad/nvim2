@@ -64,13 +64,13 @@ vim.keymap.set('', '<F1>', '<Esc>')
 vim.keymap.set('i', '<F1>', '<Esc>')
 
 -- Save all files
-vim.keymap.set('n', '<leader>a', ':wa<CR>', { noremap = true, silent = true, desc = 'Save all files' })
+vim.keymap.set('n', '<leader>W', ':wa<CR>', { noremap = true, silent = true, desc = 'Save all files' })
 
 -- More useful diffs (nvim -d) by ignoring whitespace
 vim.opt.diffopt:append('iwhite')
 
--- Files command (if you have fzf installed)
-vim.keymap.set('', '<C-p>', '<cmd>Files<cr>')
+-- Quick file finder (uses Telescope)
+vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files<cr>', { desc = 'Find files' })
 
 -- Show/hide hidden characters
 vim.keymap.set('n', '<leader>,', ':set invlist<cr>', { desc = 'Toggle list mode' })

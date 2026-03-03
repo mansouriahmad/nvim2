@@ -61,17 +61,21 @@ return {
       { "<leader>r", group = "rename/refactor" },
       { "<leader>t", group = "theme" },
       { "<leader>x", group = "trouble" },
-      { "<leader>a", group = "actions" },
+      { "<leader>a", group = "copilot-chat" },
       { "<leader>j", group = "move" },
       { "<leader>k", group = "move" },
       { "<leader>m", group = "modify" },
       { "<leader>,", group = "toggle" },
+      { "<leader>q", group = "session" },
+      { "<leader>p", group = "python" },
+      { "<leader>gN", group = "neogit" },
+      { "<leader>gd", group = "diff" },
     })
 
     -- Basic keymaps from keymaps.lua
     wk.add({
       { "<leader>e", desc = "Toggle NvimTree" },
-      { "<leader>a", desc = "Save all files" },
+      { "<leader>W", desc = "Save all files" },
       { "<leader>j", desc = "Move line down" },
       { "<leader>k", desc = "Move line up" },
       { "<leader>m", desc = "Delete until next _" },
@@ -80,7 +84,7 @@ return {
       { "L",         desc = "Go to end of line" },
       { "<left>",    desc = "Previous buffer" },
       { "<right>",   desc = "Next buffer" },
-      { "<C-p>",     desc = "Files (fzf)" },
+      { "<C-p>",     desc = "Find files (Telescope)" },
       { "<F1>",      desc = "Escape" },
     })
 
@@ -136,6 +140,7 @@ return {
       { "<leader>gSt",  desc = "Git Stash" },
       { "<leader>gSp",  desc = "Git Stash Pop" },
       { "<leader>gSl",  desc = "Git Stash List" },
+      { "<leader>gss",  desc = "Git Stash (Telescope)" },
       { "<leader>gV",   desc = "Open diff split (VS Code-like diff)" },
       { "<leader>gH",   desc = "File history" },
       { "<leader>ga",   desc = "Stage all files" },
@@ -152,6 +157,47 @@ return {
       { "<leader>cl", desc = "LSP Definitions / references / ... (Trouble)" },
       { "<leader>xL", desc = "Location List (Trouble)" },
       { "<leader>xQ", desc = "Quickfix List (Trouble)" },
+    })
+
+    -- DAP keymaps
+    wk.add({
+      { "<leader>db", desc = "Toggle Breakpoint" },
+      { "<leader>dB", desc = "Conditional Breakpoint" },
+      { "<leader>dc", desc = "Continue" },
+      { "<leader>di", desc = "Step Into" },
+      { "<leader>do", desc = "Step Over" },
+      { "<leader>dO", desc = "Step Out" },
+      { "<leader>dr", desc = "Toggle REPL" },
+      { "<leader>dl", desc = "Run Last" },
+      { "<leader>du", desc = "Toggle DAP UI" },
+      { "<leader>dT", desc = "Terminate" },
+      { "<leader>dh", desc = "Hover Variables" },
+      { "<leader>dp", desc = "Preview" },
+      { "<leader>dR", desc = "Debug Rust Target (picker)" },
+      { "<leader>dt", desc = "Debug Test Under Cursor" },
+    })
+
+    -- Session keymaps
+    wk.add({
+      { "<leader>qs", desc = "Restore Session (cwd)" },
+      { "<leader>ql", desc = "Restore Last Session" },
+      { "<leader>qd", desc = "Stop Session Recording" },
+    })
+
+    -- Diffview keymaps
+    wk.add({
+      { "<leader>gdo", desc = "Diff View Open" },
+      { "<leader>gdH", desc = "File History (Diffview)" },
+      { "<leader>gdC", desc = "Close Diff View" },
+      { "<leader>gdR", desc = "Repo History (Diffview)" },
+    })
+
+    -- Neogit keymaps
+    wk.add({
+      { "<leader>gn", desc = "Neogit (Magit-like)" },
+      { "<leader>gNc", desc = "Neogit Commit" },
+      { "<leader>gNp", desc = "Neogit Push" },
+      { "<leader>gNl", desc = "Neogit Pull" },
     })
 
     -- Visual mode keymaps

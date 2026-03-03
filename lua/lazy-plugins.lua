@@ -18,6 +18,12 @@ local plugins = {
   require('plugins.rustaceanvim'),
   require('plugins.copilot'),
   require('plugins.codecompanion'),
+  require('plugins.dap'),
+  require('plugins.surround'),
+  require('plugins.persistence'),
+  require('plugins.diffview'),
+  require('plugins.neogit'),
+  require('plugins.python'),
 }
 
 local opts = {

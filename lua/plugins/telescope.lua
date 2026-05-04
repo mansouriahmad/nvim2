@@ -191,6 +191,7 @@ return {
     vim.keymap.set('n', '<leader>sh', builtin.help_tags)
     vim.keymap.set('n', '<leader>sk', builtin.keymaps)
     vim.keymap.set('n', '<leader>sF', builtin.filetypes)
+    vim.keymap.set('n', '<leader>sr', builtin.oldfiles, { desc = 'Recent files' })
     vim.keymap.set('n', '<leader>gs', builtin.git_status)
     vim.keymap.set('n', '<leader>gc', builtin.git_commits)
     vim.keymap.set('n', '<leader>gr', builtin.git_branches)

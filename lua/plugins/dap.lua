@@ -254,6 +254,7 @@ return {
             project_python = detect_project_python()
             for _, config in ipairs(dap.configurations.python or {}) do
               config.pythonPath = project_python
+              config.console = "integratedTerminal"
             end
             vim.notify("DAP: adapter=" .. debugpy_python .. "\nDAP: project=" .. project_python, vim.log.levels.INFO)
           end,

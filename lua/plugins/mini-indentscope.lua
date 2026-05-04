@@ -1,6 +1,16 @@
 return {
   'echasnovski/mini.indentscope',
   config = function()
+    -- Disable for large files (matches treesitter's 100KB threshold)
+    vim.api.nvim_create_autocmd('BufEnter', {
+      callback = function()
+        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(0))
+        if ok and stats and stats.size > 100 * 1024 then
+          vim.b.miniindentscope_disable = true
+        end
+      end,
+    })
+
     require('mini.indentscope').setup({
       -- Draw options
       draw = {

@@ -16,14 +16,15 @@ local plugins = {
   require('plugins.git'),
   require('plugins.crates'),
   require('plugins.rustaceanvim'),
-  require('plugins.copilot'),
-  require('plugins.codecompanion'),
+  require('plugins.claudecode'),
   require('plugins.dap'),
   require('plugins.surround'),
   require('plugins.persistence'),
   require('plugins.diffview'),
   require('plugins.neogit'),
   require('plugins.python'),
+  require('plugins.terminal'),
+  require('plugins.neotest'),
 }
 
 local opts = {

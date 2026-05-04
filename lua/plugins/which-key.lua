@@ -61,7 +61,7 @@ return {
       { "<leader>r", group = "rename/refactor" },
       { "<leader>t", group = "theme" },
       { "<leader>x", group = "trouble" },
-      { "<leader>a", group = "copilot-chat" },
+      { "<leader>a", group = "claude" },
       { "<leader>j", group = "move" },
       { "<leader>k", group = "move" },
       { "<leader>m", group = "modify" },

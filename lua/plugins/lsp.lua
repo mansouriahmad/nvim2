@@ -152,9 +152,8 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
         callback = function(ev)
-          -- Setup workspace-diagnostics for this client (skip copilot)
           local client = vim.lsp.get_client_by_id(ev.data.client_id)
-          if client and client.name ~= "copilot" then
+          if client then
             require("workspace-diagnostics").setup({
               workspace_files = function()
                 -- Cross-platform file finding

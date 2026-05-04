@@ -75,6 +75,12 @@ vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files<cr>', { desc = 'Find fil
 -- Show/hide hidden characters
 vim.keymap.set('n', '<leader>,', ':set invlist<cr>', { desc = 'Toggle list mode' })
 
+-- Navigate diagnostics
+vim.keymap.set('n', ']e', function() vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }) end, { desc = 'Next error' })
+vim.keymap.set('n', '[e', function() vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }) end, { desc = 'Prev error' })
+vim.keymap.set('n', ']w', function() vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.WARN }) end,  { desc = 'Next warning' })
+vim.keymap.set('n', '[w', function() vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.WARN }) end,  { desc = 'Prev warning' })
+
 -- Always center search results
 vim.keymap.set('n', 'n', 'nzz', { silent = true })
 vim.keymap.set('n', 'N', 'Nzz', { silent = true })
@@ -84,7 +90,6 @@ vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
 
 
 -- in your init.lua or a lua config file
-vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 vim.keymap.set("i", "jk", "<Esc>", { noremap = true, silent = true })
 
 -- [[ Basic Autocommands ]]

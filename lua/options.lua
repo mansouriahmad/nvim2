@@ -1,11 +1,24 @@
 vim.g.have_nerd_fonts = true
-vim.g.python3_host_prog = '/data/miniconda3/envs/nvim-tools/bin/python'
+-- Use the conda nvim-tools env if available, otherwise fall back to system python
+local conda_python = '/data/miniconda3/envs/nvim-tools/bin/python'
+if vim.fn.executable(conda_python) == 1 then
+  vim.g.python3_host_prog = conda_python
+else
+  vim.g.python3_host_prog = vim.fn.exepath('python3')
+end
 vim.opt.foldenable = false
 vim.opt.foldmethod = 'manual'
 vim.opt.foldlevelstart = 99
 
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" },
+  {
+    command = "checktime",
+  })
+
+
 vim.opt.wildmode =
-'list:longest'                    --" Decent wildmenui in completion, when there is more than one match, list all matches, and only complete to longest common match
+'list:longest' --" Decent wildmenui in completion, when there is more than one match, list all matches, and only complete to longest common match
 
 
 vim.opt.vb = true -- never ever make my terminal beep
@@ -29,7 +42,7 @@ vim.opt.splitbelow = true                       -- force all horizontal splits t
 vim.opt.splitright = true                       -- force all vertical splits to go to the right of current window
 vim.opt.swapfile = false                        -- creates a swapfile
 vim.opt.termguicolors = true                    -- set term gui colors (most terminals support this)
-vim.opt.timeoutlen = 1000                       -- time to wait for a mapped sequence to complete (in milliseconds)
+vim.opt.timeoutlen = 300                        -- time to wait for a mapped sequence to complete (in milliseconds)
 vim.opt.undofile = true                         -- enable persistent undo
 vim.opt.updatetime = 300                        -- faster completion (4000ms default)
 vim.opt.writebackup = false                     -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
@@ -47,3 +60,12 @@ vim.opt.wrap = true                             -- display lines as one long lin
 vim.opt.scrolloff = 8                           -- is one of my fav
 vim.opt.sidescrolloff = 8
 vim.opt.guifont = "monospace:h17"               -- the font used in graphical neovim applications
+
+-- Load per-project .nvim.lua config safely (only if file is trusted)
+local local_config = vim.fn.getcwd() .. '/.nvim.lua'
+if vim.fn.filereadable(local_config) == 1 then
+  local ok, err = pcall(dofile, local_config)
+  if not ok then
+    vim.notify('Error in .nvim.lua: ' .. err, vim.log.levels.WARN)
+  end
+end

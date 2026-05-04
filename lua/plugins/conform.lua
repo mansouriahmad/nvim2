@@ -11,6 +11,8 @@ return {
         rust = { "rustfmt", lsp_format = "fallback" },
         -- C# formatting via LSP (OmniSharp handles formatting)
         cs = { lsp_format = "prefer" },
+        -- TOML formatting via taplo LSP
+        toml = { "taplo" },
         -- Conform will run the first available formatter
         javascript = { "prettierd", "prettier", stop_after_first = true },
       },
